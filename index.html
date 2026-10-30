@@ -9,14 +9,11 @@
         body { font-family: "Microsoft JhengHei", "PingFang HK", sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
         .container { max-width: 1200px; margin: 0 auto; background: #fff; padding: 20px 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         h1 { text-align: center; color: var(--primary); margin-bottom: 30px; }
-        
-        /* 篩選器區域 */
         .filter-section { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; background: #f9fbfd; padding: 15px; border-radius: 8px; border: 1px solid var(--border); }
         .filter-group { display: flex; flex-direction: column; flex: 1; min-width: 150px; }
         .filter-group label { font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #555; }
         .filter-group select, .filter-group input { padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
         .search-bar { flex: 2; min-width: 200px; }
-        
         .stats { text-align: right; font-size: 14px; color: #666; margin-bottom: 10px; font-weight: bold; }
         .table-responsive { overflow-x: auto; max-height: 600px; }
         table { width: 100%; border-collapse: collapse; white-space: nowrap; }
@@ -24,27 +21,30 @@
         th { background-color: var(--primary); color: white; position: sticky; top: 0; font-weight: 500; z-index: 10; }
         tr:hover { background-color: #f1f5f9; }
         .badge { background: #e9ecef; padding: 4px 8px; border-radius: 4px; font-size: 13px; }
-        .rank-1 { color: #d4af37; font-weight: bold; } /* 金 */
-        .rank-2 { color: #9ca3af; font-weight: bold; } /* 銀 */
-        .rank-3 { color: #cd7f32; font-weight: bold; } /* 銅 */
+        .rank-1 { color: #d4af37; font-weight: bold; }
+        .rank-2 { color: #9ca3af; font-weight: bold; }
+        .rank-3 { color: #cd7f32; font-weight: bold; }
     </style>
 </head>
 <body>
 <div class="container">
     <h1>🏆 保良局屬下小學田徑歷屆成績庫</h1>
     
-    <!-- 下拉選單與搜尋 -->
     <div class="filter-section">
         <div class="filter-group">
             <label for="editionFilter">屆別</label>
             <select id="editionFilter">
                 <option value="">全部屆別</option>
-                <option value="第一屆 (2004)">第一屆 (2004)</option>
-                <option value="第二屆 (2005)">第二屆 (2005)</option>
-                <option value="第三屆 (2007)">第三屆 (2007)</option>
-                <option value="第四屆 (2007)">第四屆 (2007/12)</option>
-                <option value="第五屆 (2008)">第五屆 (2008)</option>
-                <option value="第六屆 (2009)">第六屆 (2009)</option>
+                <option value="第一屆">第一屆 (2004)</option>
+                <option value="第二屆">第二屆 (2005)</option>
+                <option value="第三屆">第三屆 (2007/01)</option>
+                <option value="第四屆">第四屆 (2007/12)</option>
+                <option value="第五屆">第五屆 (2008)</option>
+                <option value="第六屆">第六屆 (2009)</option>
+                <option value="第七屆">第七屆 (2010)</option>
+                <option value="第八屆">第八屆 (2011)</option>
+                <option value="第九屆">第九屆 (2012)</option>
+                <option value="第十屆">第十屆 (2013)</option>
             </select>
         </div>
         <div class="filter-group">
@@ -64,20 +64,15 @@
             <label for="eventFilter">項目</label>
             <select id="eventFilter">
                 <option value="">全部項目</option>
-                <option value="團體">團體成績</option>
-                <option value="60米短跑">60米短跑</option>
-                <option value="100米短跑">100米短跑</option>
-                <option value="200米短跑">200米短跑</option>
+                <option value="團體">團體成績/全場總成績</option>
+                <option value="短跑">短跑 (60/100/200米)</option>
                 <option value="接力">接力賽</option>
-                <option value="跳遠">跳遠</option>
-                <option value="跳高">跳高</option>
-                <option value="壘球">壘球/木球</option>
-                <option value="鉛球">鉛球</option>
+                <option value="田賽">田賽 (跳遠/跳高/壘球/鉛球/木球)</option>
             </select>
         </div>
         <div class="filter-group search-bar">
             <label for="searchInput">關鍵字搜尋</label>
-            <input type="text" id="searchInput" placeholder="輸入姓名、學校或分數 (例如：錦泰、陳守仁)...">
+            <input type="text" id="searchInput" placeholder="輸入姓名、學校或分數 (例如：錦泰)...">
         </div>
     </div>
 
@@ -97,263 +92,333 @@
                 </tr>
             </thead>
             <tbody id="tableBody">
-                <!-- 資料將由 JavaScript 動態生成 -->
             </tbody>
         </table>
     </div>
 </div>
 
 <script>
-    // ==========================================
-    // 📊 資料庫區塊 (包含第一、二、三、六屆詳細個人與團體成績)
-    // ==========================================
     const athleticsData = [
-        // ====== 第一屆 (2004) 團體成績 ======
-        { edition: "第一屆 (2004)", group: "全場", event: "全場總冠軍", rank: "第一名", name: "-", school: "錦泰", score: "104分" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "團體成績", rank: "第一名", name: "-", school: "雨川", score: "32分" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "團體成績", rank: "第一名", name: "-", school: "錦泰", score: "47分" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "團體成績", rank: "第一名", name: "-", school: "朱正賢上", score: "37分" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "團體成績", rank: "第一名", name: "-", school: "方王錦全", score: "36分" },
+        // ==========================================
+        // 第一屆 (2004) 團體成績
+        // ==========================================
+        { edition: "第一屆 (2004)", group: "全場", event: "全場總成績", rank: "第一名 (冠軍)", name: "-", school: "錦泰", score: "104分" },
+        { edition: "第一屆 (2004)", group: "男子甲組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "雨川", score: "32分" },
+        { edition: "第一屆 (2004)", group: "男子甲組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "錦泰", score: "27分" },
+        { edition: "第一屆 (2004)", group: "男子甲組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "方王錦全", score: "20分" },
+        { edition: "第一屆 (2004)", group: "男子甲組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "莊啟程", score: "19分" },
+        { edition: "第一屆 (2004)", group: "男子乙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "朱正賢上", score: "37分" },
+        { edition: "第一屆 (2004)", group: "男子乙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "黃族宗親會", score: "29分" },
+        { edition: "第一屆 (2004)", group: "男子乙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "陳溢", score: "21分" },
+        { edition: "第一屆 (2004)", group: "男子乙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "梁周順琴上", score: "20分" },
+        { edition: "第一屆 (2004)", group: "女子甲組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "錦泰", score: "47分" },
+        { edition: "第一屆 (2004)", group: "女子甲組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "黃族宗親會", score: "29分" },
+        { edition: "第一屆 (2004)", group: "女子甲組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "陳溢", score: "25分" },
+        { edition: "第一屆 (2004)", group: "女子甲組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "朱正賢上", score: "23分" },
+        { edition: "第一屆 (2004)", group: "女子乙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "方王錦全", score: "36分" },
+        { edition: "第一屆 (2004)", group: "女子乙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "莊二下", score: "24分" },
+        { edition: "第一屆 (2004)", group: "女子乙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "志豪", score: "20分" },
+        { edition: "第一屆 (2004)", group: "女子乙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "莊啟程", score: "18分" },
 
-        // ====== 第一屆 (2004) 男子甲組 ======
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "100米短跑", rank: "第一名", name: "廖雙友", school: "黃永樹", score: "13.64" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "100米短跑", rank: "第二名", name: "招啟峰", school: "陸慶濤", score: "13.97" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "100米短跑", rank: "第三名", name: "吳卓源", school: "錦泰", score: "14.27" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "100米短跑", rank: "第四名", name: "張浩賢", school: "錦泰", score: "14.59" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "100米短跑", rank: "第五名", name: "洪俊佳", school: "蕭漢森", score: "14.68" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "100米短跑", rank: "第六名", name: "容子樺", school: "莊二下", score: "14.71" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "100米短跑", rank: "第七名", name: "黃嘉康", school: "陳南昌", score: "14.74" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "100米短跑", rank: "第八名", name: "岑偉仁", school: "黃族宗親會", score: "15.07" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "200米短跑", rank: "第一名", name: "王子建", school: "蕭漢森", score: "28.8" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "200米短跑", rank: "第二名", name: "羅業烜", school: "世德", score: "29.13" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "200米短跑", rank: "第三名", name: "鄺海亮", school: "陳溢", score: "29.43" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "200米短跑", rank: "第四名", name: "翁惠德", school: "莊二上", score: "29.44" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "200米短跑", rank: "第五名", name: "黃錦輝", school: "方王錦全", score: "29.77" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "200米短跑", rank: "第六名", name: "何秉錕", school: "張凝文", score: "30.08" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "200米短跑", rank: "第七名", name: "吳浩鵬", school: "莊二下", score: "30.36" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "200米短跑", rank: "第八名", name: "劉筆樂", school: "朱正賢上", score: "30.64" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "接力", rank: "第一名", name: "-", school: "雨川", score: "57.41" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "接力", rank: "第二名", name: "-", school: "莊啟程", score: "57.6" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "接力", rank: "第三名", name: "-", school: "錦泰", score: "57.8" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "接力", rank: "第四名", name: "-", school: "方王錦全", score: "58.27" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "接力", rank: "第五名", name: "-", school: "莊二上", score: "58.65" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "接力", rank: "第六名", name: "-", school: "陳溢", score: "59.18" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "接力", rank: "第七名", name: "-", school: "世德", score: "59.47" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "接力", rank: "第八名", name: "-", school: "蕭漢森", score: "59.67" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "跳遠", rank: "第一名", name: "陳朗", school: "志豪", score: "4.12m" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "跳遠", rank: "第二名", name: "何俊煒", school: "雨川", score: "3.88m" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "跳遠", rank: "第三名", name: "莫金明", school: "陳溢", score: "3.8m" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "跳遠", rank: "第四名", name: "林松江", school: "馮晴", score: "3.73m" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "跳遠", rank: "第五名", name: "程子曦", school: "世德", score: "3.61m" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "跳遠", rank: "第六名", name: "陶俊朗", school: "莊二下", score: "3.58m" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "跳遠", rank: "第七名", name: "曾桂昌", school: "田千", score: "3.56m" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "跳遠", rank: "第八名", name: "曾子峰", school: "梁周下", score: "3.52m" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "壘球", rank: "第一名", name: "莊浩霖", school: "莊二下", score: "39.69m" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "壘球", rank: "第二名", name: "劉凱誠", school: "雨川", score: "39.59m" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "壘球", rank: "第三名", name: "李家舜", school: "方王錦全", score: "33.97m" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "壘球", rank: "第四名", name: "葉志承", school: "莊啟程", score: "32.74m" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "壘球", rank: "第五名", name: "楊卓謙", school: "錦泰", score: "31.92m" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "壘球", rank: "第六名", name: "曾瞬軒", school: "莊二上", score: "30.64m" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "壘球", rank: "第七名", name: "李桑泰", school: "志豪", score: "30.16m" },
-        { edition: "第一屆 (2004)", group: "男子甲組", event: "壘球", rank: "第八名", name: "鄧啟文", school: "朱正賢下", score: "30.02m" },
+        // ==========================================
+        // 第二屆 (2005) 團體成績
+        // ==========================================
+        { edition: "第二屆 (2005)", group: "全場", event: "全場總成績", rank: "第一名 (冠軍)", name: "-", school: "志豪 / 莊啟程", score: "147分" },
+        { edition: "第二屆 (2005)", group: "全場", event: "全場總成績", rank: "第三名 (季軍)", name: "-", school: "朱正賢", score: "128分" },
+        { edition: "第二屆 (2005)", group: "全場", event: "全場總成績", rank: "第四名 (殿軍)", name: "-", school: "錦泰", score: "113分" },
+        { edition: "第二屆 (2005)", group: "男子甲組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "黃族宗親會", score: "40分" },
+        { edition: "第二屆 (2005)", group: "男子甲組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "志豪", score: "34分" },
+        { edition: "第二屆 (2005)", group: "男子甲組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "朱正賢", score: "26分" },
+        { edition: "第二屆 (2005)", group: "男子甲組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "莊二下", score: "24分" },
+        { edition: "第二屆 (2005)", group: "男子乙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "志豪", score: "30分" },
+        { edition: "第二屆 (2005)", group: "男子乙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "朱正賢", score: "29分" },
+        { edition: "第二屆 (2005)", group: "男子乙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "黃永樹", score: "21分" },
+        { edition: "第二屆 (2005)", group: "男子乙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "莊二下", score: "19分" },
+        { edition: "第二屆 (2005)", group: "男子丙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "莊啟程", score: "40分" },
+        { edition: "第二屆 (2005)", group: "男子丙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "志豪", score: "28分" },
+        { edition: "第二屆 (2005)", group: "男子丙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "朱正賢", score: "26分" },
+        { edition: "第二屆 (2005)", group: "男子丙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "陳守仁", score: "20分" },
+        { edition: "第二屆 (2005)", group: "女子甲組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "田千", score: "50分" },
+        { edition: "第二屆 (2005)", group: "女子甲組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "莊啟程", score: "32分" },
+        { edition: "第二屆 (2005)", group: "女子甲組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "志豪", score: "28分" },
+        { edition: "第二屆 (2005)", group: "女子甲組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "黃族宗親會", score: "27分" },
+        { edition: "第二屆 (2005)", group: "女子乙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "錦泰", score: "39分" },
+        { edition: "第二屆 (2005)", group: "女子乙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "莊啟程", score: "29分" },
+        { edition: "第二屆 (2005)", group: "女子乙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "朱正賢", score: "29分" },
+        { edition: "第二屆 (2005)", group: "女子乙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "莊二上", score: "17分" },
+        { edition: "第二屆 (2005)", group: "女子丙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "蕭漢森", score: "31分" },
+        { edition: "第二屆 (2005)", group: "女子丙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "莊啟程", score: "27分" },
+        { edition: "第二屆 (2005)", group: "女子丙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "馮晴", score: "18分" },
+        { edition: "第二屆 (2005)", group: "女子丙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "志豪", score: "13分" },
 
-        // ====== 第一屆 (2004) 女子甲組 ======
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "100米短跑", rank: "第一名", name: "劉穎恩", school: "錦泰", score: "14.707" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "100米短跑", rank: "第二名", name: "黃麗晶", school: "黃族宗親會", score: "14.807" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "100米短跑", rank: "第三名", name: "蘇玉湄", school: "田千", score: "15.059" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "100米短跑", rank: "第四名", name: "楊琪敏", school: "莊二上", score: "15.114" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "100米短跑", rank: "第五名", name: "黃建文", school: "莊啟程", score: "15.118" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "100米短跑", rank: "第六名", name: "方淑敏", school: "陳南昌", score: "15.122" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "100米短跑", rank: "第七名", name: "張沛珊", school: "黃族宗親會", score: "15.294" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "100米短跑", rank: "第八名", name: "陳綺琪", school: "梁周下", score: "15.298" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "200米短跑", rank: "第一名", name: "林事延", school: "陳溢", score: "31.08" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "200米短跑", rank: "第二名", name: "黃映彤", school: "朱正賢上", score: "31.24" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "200米短跑", rank: "第三名", name: "蒙曉晴", school: "世德", score: "32.35" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "200米短跑", rank: "第四名", name: "閔晚宜", school: "世德", score: "32.86" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "200米短跑", rank: "第五名", name: "彭可翹", school: "朱正賢上", score: "32.9" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "200米短跑", rank: "第六名", name: "李景妍", school: "馮晴", score: "33.54" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "200米短跑", rank: "第七名", name: "許清怡", school: "錦泰", score: "33.66" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "200米短跑", rank: "第八名", name: "陳穎深", school: "蕭漢森", score: "33.8" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "接力", rank: "第一名", name: "-", school: "錦泰", score: "59.83" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "接力", rank: "第二名", name: "-", school: "黃族宗親會", score: "59.95" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "接力", rank: "第三名", name: "-", school: "朱正賢上", score: "1:01.13" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "接力", rank: "第四名", name: "-", school: "陳溢", score: "1:01.44" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "接力", rank: "第五名", name: "-", school: "田千", score: "1:02.28" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "接力", rank: "第六名", name: "-", school: "莊二下", score: "1:02.29" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "接力", rank: "第七名", name: "-", school: "莊二上", score: "1:03.95" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "接力", rank: "第八名", name: "-", school: "馮晴", score: "1:04.47" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "跳遠", rank: "第一名", name: "蔣美宜", school: "錦泰", score: "3.63m" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "跳遠", rank: "第二名", name: "古佩琪", school: "馮晴", score: "3.42m" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "跳遠", rank: "第三名", name: "陳秀文", school: "黃族宗親會", score: "3.35m" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "跳遠", rank: "第四名", name: "劉昭彤", school: "世德", score: "3.31m" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "跳遠", rank: "第五名", name: "周潤嫻", school: "朱正賢下", score: "3.3m" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "跳遠", rank: "第六名", name: "鍾佩恩", school: "莊啟程", score: "3.16m" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "跳遠", rank: "第七名", name: "文翠瑩", school: "田千", score: "3.14m" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "跳遠", rank: "第八名", name: "徐穎詩", school: "莊二上", score: "3.1m" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "壘球", rank: "第一名", name: "曾子媛", school: "錦泰", score: "31.4m" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "壘球", rank: "第二名", name: "馬安琳", school: "莊二下", score: "25.3m" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "壘球", rank: "第三名", name: "鄺淑敏", school: "陳溢", score: "24.89m" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "壘球", rank: "第四名", name: "伍施彤", school: "馮晴", score: "24.48m" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "壘球", rank: "第五名", name: "陳凱婷", school: "朱正賢下", score: "23.89m" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "壘球", rank: "第六名", name: "雷穎琪", school: "志豪", score: "22.21m" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "壘球", rank: "第七名", name: "黃穎思", school: "方王錦全", score: "22m" },
-        { edition: "第一屆 (2004)", group: "女子甲組", event: "壘球", rank: "第八名", name: "林曉芬", school: "陸慶濤", score: "18.87m" },
+        // ==========================================
+        // 第三屆 (2007/01) 團體成績
+        // ==========================================
+        { edition: "第三屆 (2007)", group: "全場", event: "全場總成績", rank: "第一名 (冠軍)", name: "-", school: "方王錦全", score: "210分" },
+        { edition: "第三屆 (2007)", group: "全場", event: "全場總成績", rank: "第二名 (亞軍)", name: "-", school: "志豪", score: "168分" },
+        { edition: "第三屆 (2007)", group: "全場", event: "全場總成績", rank: "第三名 (季軍)", name: "-", school: "馮晴", score: "164分" },
+        { edition: "第三屆 (2007)", group: "全場", event: "全場總成績", rank: "第四名 (殿軍)", name: "-", school: "朱正賢", score: "160分" },
+        { edition: "第三屆 (2007)", group: "男子甲組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "方王錦全", score: "62分" },
+        { edition: "第三屆 (2007)", group: "男子甲組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "志豪", score: "42分" },
+        { edition: "第三屆 (2007)", group: "男子甲組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "朱正賢", score: "37分" },
+        { edition: "第三屆 (2007)", group: "男子甲組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "黃族宗親會", score: "35分" },
+        { edition: "第三屆 (2007)", group: "男子乙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "朱正賢", score: "48分" },
+        { edition: "第三屆 (2007)", group: "男子乙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "莊啟程", score: "41分" },
+        { edition: "第三屆 (2007)", group: "男子乙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "志豪", score: "39分" },
+        { edition: "第三屆 (2007)", group: "男子乙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "馮晴", score: "23分" },
+        { edition: "第三屆 (2007)", group: "男子丙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "方王錦全", score: "43分" },
+        { edition: "第三屆 (2007)", group: "男子丙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "莊啟程", score: "29分" },
+        { edition: "第三屆 (2007)", group: "男子丙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "錦泰", score: "24分" },
+        { edition: "第三屆 (2007)", group: "男子丙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "馮晴", score: "22分" },
+        { edition: "第三屆 (2007)", group: "女子甲組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "朱正賢", score: "49分" },
+        { edition: "第三屆 (2007)", group: "女子甲組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "方王錦全", score: "41分" },
+        { edition: "第三屆 (2007)", group: "女子甲組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "志豪", score: "31分" },
+        { edition: "第三屆 (2007)", group: "女子甲組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "莊啟程", score: "28分" },
+        { edition: "第三屆 (2007)", group: "女子乙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "馮晴", score: "50分" },
+        { edition: "第三屆 (2007)", group: "女子乙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "方王錦全", score: "39分" },
+        { edition: "第三屆 (2007)", group: "女子乙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "蕭漢森", score: "34分" },
+        { edition: "第三屆 (2007)", group: "女子乙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "莊啟程", score: "31分" },
+        { edition: "第三屆 (2007)", group: "女子丙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "錦泰", score: "35分" },
+        { edition: "第三屆 (2007)", group: "女子丙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "馮晴", score: "26分" },
+        { edition: "第三屆 (2007)", group: "女子丙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "陳守仁", score: "26分" },
+        { edition: "第三屆 (2007)", group: "女子丙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "田千", score: "24分" },
 
-        // ====== 第一屆 (2004) 男子乙組 ======
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "60米短跑", rank: "第一名", name: "柯炬廷", school: "梁周上", score: "9.43" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "60米短跑", rank: "第二名", name: "鄧敏灝", school: "陳溢", score: "9.44" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "60米短跑", rank: "第三名", name: "譚啟業", school: "朱正賢上", score: "9.46" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "60米短跑", rank: "第四名", name: "邱志宏", school: "黃族宗親會", score: "9.49" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "60米短跑", rank: "第五名", name: "鄧康", school: "黃族宗親會", score: "9.52" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "60米短跑", rank: "第六名", name: "趙銘裕", school: "梁周上", score: "9.7" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "60米短跑", rank: "第七名", name: "蔡豪軒", school: "陸慶濤", score: "9.71" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "60米短跑", rank: "第八名", name: "袁皓軒", school: "陳南昌", score: "9.78" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "100米短跑", rank: "第一名", name: "黃展鵬", school: "朱正賢上", score: "14.93" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "100米短跑", rank: "第二名", name: "葉尚銘", school: "錦泰", score: "15.38" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "100米短跑", rank: "第三名", name: "李俊熙", school: "莊二下", score: "15.44" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "100米短跑", rank: "第四名", name: "許建釗", school: "黃族宗親會", score: "15.51" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "100米短跑", rank: "第五名", name: "黃駿昌", school: "何壽南", score: "15.58" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "100米短跑", rank: "第六名", name: "陳柏軒", school: "朱正賢下", score: "15.74" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "100米短跑", rank: "第七名", name: "石啟康", school: "世德", score: "16" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "100米短跑", rank: "第八名", name: "陳靖霖", school: "志豪", score: "16.07" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "接力", rank: "第一名", name: "-", school: "朱正賢上", score: "1:00.85" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "接力", rank: "第二名", name: "-", school: "馮晴", score: "1:02.21" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "接力", rank: "第三名", name: "-", school: "陳溢", score: "1:02.9" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "接力", rank: "第四名", name: "-", school: "黃族宗親會", score: "1:02.93" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "接力", rank: "第五名", name: "-", school: "梁周上", score: "1:03.33" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "接力", rank: "第六名", name: "-", school: "朱正賢下", score: "1:03.39" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "接力", rank: "第七名", name: "-", school: "世德", score: "1:03.89" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "接力", rank: "第八名", name: "-", school: "莊啟程", score: "1:04.5" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "跳遠", rank: "第一名", name: "黃心朗", school: "錦泰", score: "3.67m" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "跳遠", rank: "第二名", name: "王健瑋", school: "朱正賢下", score: "3.64m" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "跳遠", rank: "第三名", name: "黃永聰", school: "雨川", score: "3.6m" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "跳遠", rank: "第四名", name: "曾佳俊", school: "黃族宗親會", score: "3.59m" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "跳遠", rank: "第五名", name: "何景軒", school: "朱正賢上", score: "3.57m" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "跳遠", rank: "第六名", name: "陳志強", school: "志豪", score: "3.56m" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "跳遠", rank: "第七名", name: "張熊", school: "賈梅士", score: "3.53m" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "跳遠", rank: "第八名", name: "陳翰駿", school: "蕭漢森", score: "3.48m" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "木球", rank: "第一名", name: "吳祉謙", school: "田千", score: "34.37m" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "木球", rank: "第二名", name: "伍曉峰", school: "莊二上", score: "31.95m" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "木球", rank: "第三名", name: "溫嘉浚", school: "陳南昌", score: "31.17m" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "木球", rank: "第四名", name: "何浩賢", school: "志豪", score: "31.1m" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "木球", rank: "第五名", name: "陳彥州", school: "何壽南", score: "29.23m" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "木球", rank: "第六名", name: "陳景賢", school: "世德", score: "26.69m" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "木球", rank: "第七名", name: "王德偉", school: "陳溢", score: "26.55m" },
-        { edition: "第一屆 (2004)", group: "男子乙組", event: "木球", rank: "第八名", name: "岑岳霖", school: "馮晴", score: "26.29m" },
+        // ==========================================
+        // 第四屆 (2007/12) 團體成績
+        // ==========================================
+        { edition: "第四屆 (2007)", group: "全場", event: "全場總成績", rank: "第一名 (冠軍)", name: "-", school: "錦泰", score: "190分" },
+        { edition: "第四屆 (2007)", group: "全場", event: "全場總成績", rank: "第二名 (亞軍)", name: "-", school: "方王錦全", score: "158.5分" },
+        { edition: "第四屆 (2007)", group: "全場", event: "全場總成績", rank: "第三名 (季軍)", name: "-", school: "志豪", score: "141.5分" },
+        { edition: "第四屆 (2007)", group: "全場", event: "全場總成績", rank: "第四名 (殿軍)", name: "-", school: "田千", score: "132分" },
+        { edition: "第四屆 (2007)", group: "男子甲組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "朱正賢", score: "46分" },
+        { edition: "第四屆 (2007)", group: "男子甲組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "錦泰", score: "36分" },
+        { edition: "第四屆 (2007)", group: "男子甲組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "世德", score: "30分" },
+        { edition: "第四屆 (2007)", group: "男子甲組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "莊啟程", score: "26分" },
+        { edition: "第四屆 (2007)", group: "男子乙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "方王錦全", score: "42分" },
+        { edition: "第四屆 (2007)", group: "男子乙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "錦泰", score: "41分" },
+        { edition: "第四屆 (2007)", group: "男子乙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "志豪", score: "26分" },
+        { edition: "第四屆 (2007)", group: "男子乙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "莊啟程", score: "22分" },
+        { edition: "第四屆 (2007)", group: "男子丙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "馮晴", score: "38分" },
+        { edition: "第四屆 (2007)", group: "男子丙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "志豪", score: "30分" },
+        { edition: "第四屆 (2007)", group: "男子丙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "錦泰", score: "25分" },
+        { edition: "第四屆 (2007)", group: "男子丙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "何壽南", score: "17分" },
+        { edition: "第四屆 (2007)", group: "女子甲組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "方王錦全", score: "57分" },
+        { edition: "第四屆 (2007)", group: "女子甲組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "馮晴", score: "47分" },
+        { edition: "第四屆 (2007)", group: "女子甲組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "田千", score: "41分" },
+        { edition: "第四屆 (2007)", group: "女子甲組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "志豪", score: "34.5分" },
+        { edition: "第四屆 (2007)", group: "女子乙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "世德", score: "35分" },
+        { edition: "第四屆 (2007)", group: "女子乙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "田千", score: "34分" },
+        { edition: "第四屆 (2007)", group: "女子乙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "錦泰", score: "33分" },
+        { edition: "第四屆 (2007)", group: "女子乙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "梁周順琴(下)", score: "27分" },
+        { edition: "第四屆 (2007)", group: "女子丙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "錦泰", score: "25分" },
+        { edition: "第四屆 (2007)", group: "女子丙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "莊啟程二上", score: "24分" },
+        { edition: "第四屆 (2007)", group: "女子丙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "田千", score: "23分" },
+        { edition: "第四屆 (2007)", group: "女子丙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "陳溢", score: "22.5分" },
 
-        // ====== 第一屆 (2004) 女子乙組 ======
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "60米短跑", rank: "第一名", name: "陳紫婷", school: "黃族宗親會", score: "9.57" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "60米短跑", rank: "第二名", name: "李欣燒", school: "田千", score: "9.59" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "60米短跑", rank: "第三名", name: "殷愷桐", school: "錦泰", score: "9.63" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "60米短跑", rank: "第四名", name: "黃禮礽", school: "陳南昌", score: "9.73" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "60米短跑", rank: "第五名", name: "袁樂汶", school: "志豪", score: "9.75" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "60米短跑", rank: "第六名", name: "黃凱彤", school: "田千", score: "9.76" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "60米短跑", rank: "第七名", name: "陳佩姍", school: "田千", score: "9.77" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "60米短跑", rank: "第八名", name: "吳倩雯", school: "朱正賢上", score: "9.92" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "100米短跑", rank: "第一名", name: "姚嘉琪", school: "方王錦全", score: "14.63" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "100米短跑", rank: "第二名", name: "梁秀金", school: "蕭漢森", score: "15.54" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "100米短跑", rank: "第三名", name: "曾卉樂", school: "莊啟程", score: "15.83" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "100米短跑", rank: "第四名", name: "秦嘉裕", school: "馮晴", score: "15.96" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "100米短跑", rank: "第五名", name: "鄭凱瑩", school: "莊二下", score: "16.03" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "100米短跑", rank: "第六名", name: "李穎芝", school: "朱正賢上", score: "16.24" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "100米短跑", rank: "第七名", name: "戴蘇津", school: "陸慶濤", score: "16.25" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "100米短跑", rank: "第八名", name: "徐洛怡", school: "蕭漢森", score: "16.26" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "接力", rank: "第一名", name: "-", school: "方王錦全", score: "1:02.6" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "接力", rank: "第二名", name: "-", school: "莊二下", score: "1:03.41" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "接力", rank: "第三名", name: "-", school: "朱正賢下", score: "1:04.34" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "接力", rank: "第四名", name: "-", school: "莊啟程", score: "1:04.46" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "接力", rank: "第五名", name: "-", school: "錦泰", score: "1:04.68" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "接力", rank: "第六名", name: "-", school: "志豪", score: "1:05.08" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "接力", rank: "第七名", name: "-", school: "朱正賢上", score: "1:05.27" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "接力", rank: "第八名", name: "-", school: "-", score: "-" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "跳遠", rank: "第一名", name: "黃寶珊", school: "陳南昌", score: "3.26m" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "跳遠", rank: "第二名", name: "劉于搖", school: "馮晴", score: "3.24m" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "跳遠", rank: "第三名", name: "吳倩婷", school: "莊二下", score: "3.15m" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "跳遠", rank: "第四名", name: "陳嘉媛", school: "田家炳", score: "3.05m" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "跳遠", rank: "第五名", name: "梁乂元", school: "莊二上", score: "3.04m" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "跳遠", rank: "第六名", name: "何倩儀", school: "志豪", score: "3.02m" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "跳遠", rank: "第七名", name: "徐善彤", school: "莊啟程", score: "2.92m" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "跳遠", rank: "第八名", name: "何瑞珊", school: "陸慶濤", score: "2.89m" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "木球", rank: "第一名", name: "梁凱棋", school: "方王錦全", score: "25.4m" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "木球", rank: "第二名", name: "林鈺婷", school: "志豪", score: "24.58m" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "木球", rank: "第三名", name: "胡心頤", school: "世德", score: "21.05m" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "木球", rank: "第四名", name: "林芷欣", school: "莊二上", score: "20.92m" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "木球", rank: "第五名", name: "蕭欣庭", school: "朱正賢下", score: "20.18m" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "木球", rank: "第六名", name: "葉珏翎", school: "蕭漢森", score: "19.74m" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "木球", rank: "第七名", name: "馬梓繕", school: "陳南昌", score: "18.96m" },
-        { edition: "第一屆 (2004)", group: "女子乙組", event: "木球", rank: "第八名", name: "鄭慧嫻", school: "陸慶濤", score: "18.72m" },
+        // ==========================================
+        // 第五屆 (2008) 團體成績
+        // ==========================================
+        { edition: "第五屆 (2008)", group: "全場", event: "全場總成績", rank: "第一名 (冠軍)", name: "-", school: "錦泰", score: "192分" },
+        { edition: "第五屆 (2008)", group: "全場", event: "全場總成績", rank: "第二名 (亞軍)", name: "-", school: "田千", score: "146分" },
+        { edition: "第五屆 (2008)", group: "全場", event: "全場總成績", rank: "第三名 (季軍)", name: "-", school: "陳守仁", score: "129.5分" },
+        { edition: "第五屆 (2008)", group: "全場", event: "全場總成績", rank: "第四名 (殿軍)", name: "-", school: "志豪", score: "129分" },
+        { edition: "第五屆 (2008)", group: "男子甲組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "志豪", score: "49分" },
+        { edition: "第五屆 (2008)", group: "男子甲組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "錦泰", score: "47分" },
+        { edition: "第五屆 (2008)", group: "男子甲組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "梁周下", score: "42分" },
+        { edition: "第五屆 (2008)", group: "男子甲組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "莊啟程", score: "37分" },
+        { edition: "第五屆 (2008)", group: "男子乙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "馮晴", score: "43分" },
+        { edition: "第五屆 (2008)", group: "男子乙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "志豪", score: "35分" },
+        { edition: "第五屆 (2008)", group: "男子乙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "何壽南", score: "28分" },
+        { edition: "第五屆 (2008)", group: "男子乙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "莊二上", score: "24分" },
+        { edition: "第五屆 (2008)", group: "男子丙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "錦泰", score: "34分" },
+        { edition: "第五屆 (2008)", group: "男子丙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "圓玄", score: "32分" },
+        { edition: "第五屆 (2008)", group: "男子丙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "志豪", score: "22分" },
+        { edition: "第五屆 (2008)", group: "男子丙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "陳守仁", score: "20分" },
+        { edition: "第五屆 (2008)", group: "女子甲組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "錦泰", score: "65分" },
+        { edition: "第五屆 (2008)", group: "女子甲組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "陳守仁", score: "55分" },
+        { edition: "第五屆 (2008)", group: "女子甲組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "田千", score: "32分" },
+        { edition: "第五屆 (2008)", group: "女子甲組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "陳溢", score: "29分" },
+        { edition: "第五屆 (2008)", group: "女子乙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "錦泰", score: "42分" },
+        { edition: "第五屆 (2008)", group: "女子乙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "田千", score: "38分" },
+        { edition: "第五屆 (2008)", group: "女子乙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "莊二上", score: "29分" },
+        { edition: "第五屆 (2008)", group: "女子乙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "蔡繼有", score: "22分" },
+        { edition: "第五屆 (2008)", group: "女子丙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "莊啟程", score: "36分" },
+        { edition: "第五屆 (2008)", group: "女子丙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "圓玄", score: "28分" },
+        { edition: "第五屆 (2008)", group: "女子丙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "陳守仁", score: "27分" },
+        { edition: "第五屆 (2008)", group: "女子丙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "馮晴", score: "21分" },
 
-        // ====== 第二屆 (2005) ======
-        { edition: "第二屆 (2005)", group: "全場", event: "全場總冠軍", rank: "第一名", name: "-", school: "志豪 / 莊啟程", score: "147分" },
-        { edition: "第二屆 (2005)", group: "全場", event: "全場總季軍", rank: "第三名", name: "-", school: "朱正賢", score: "128分" },
-        { edition: "第二屆 (2005)", group: "全場", event: "全場總殿軍", rank: "第四名", name: "-", school: "錦泰", score: "113分" },
-        { edition: "第二屆 (2005)", group: "男子甲組", event: "團體成績", rank: "第一名", name: "-", school: "黃族宗親會", score: "40分" },
-        { edition: "第二屆 (2005)", group: "女子甲組", event: "團體成績", rank: "第一名", name: "-", school: "田千", score: "50分" },
-        { edition: "第二屆 (2005)", group: "男子乙組", event: "團體成績", rank: "第一名", name: "-", school: "志豪", score: "30分" },
-        { edition: "第二屆 (2005)", group: "女子乙組", event: "團體成績", rank: "第一名", name: "-", school: "錦泰", score: "39分" },
-        { edition: "第二屆 (2005)", group: "男子丙組", event: "團體成績", rank: "第一名", name: "-", school: "莊啟程", score: "40分" },
-        { edition: "第二屆 (2005)", group: "女子丙組", event: "團體成績", rank: "第一名", name: "-", school: "蕭漢森", score: "31分" },
-        { edition: "第二屆 (2005)", group: "男子甲組", event: "跳遠", rank: "第一名", name: "-", school: "-", score: "4.30m" },
-        { edition: "第二屆 (2005)", group: "男子甲組", event: "鉛球", rank: "第一名", name: "許", school: "-", score: "8.34m" },
-        { edition: "第二屆 (2005)", group: "男子甲組", event: "壘球", rank: "第一名", name: "吳秉", school: "-", score: "34.46m" },
-        { edition: "第二屆 (2005)", group: "女子甲組", event: "跳遠", rank: "第一名", name: "來文", school: "-", score: "4.05m" },
-        { edition: "第二屆 (2005)", group: "女子甲組", event: "壘球", rank: "第一名", name: "正", school: "-", score: "30.13m" },
-        { edition: "第二屆 (2005)", group: "男子乙組", event: "壘球", rank: "第一名", name: "何", school: "-", score: "38m" },
-        { edition: "第二屆 (2005)", group: "男子乙組", event: "100米短跑", rank: "第一名", name: "CHI", school: "-", score: "12.54" },
-        { edition: "第二屆 (2005)", group: "男子丙組", event: "跳遠", rank: "第一名", name: "开水", school: "-", score: "3.64m" },
+        // ==========================================
+        // 第六屆 (2009) 團體成績
+        // ==========================================
+        { edition: "第六屆 (2009)", group: "全場", event: "全場總成績", rank: "第一名 (冠軍)", name: "-", school: "陳守仁", score: "164分" },
+        { edition: "第六屆 (2009)", group: "全場", event: "全場總成績", rank: "第二名 (亞軍)", name: "-", school: "田千", score: "130分" },
+        { edition: "第六屆 (2009)", group: "全場", event: "全場總成績", rank: "第三名 (季軍)", name: "-", school: "陸慶濤", score: "129分" },
+        { edition: "第六屆 (2009)", group: "全場", event: "全場總成績", rank: "第四名 (殿軍)", name: "-", school: "志豪", score: "126分" },
+        { edition: "第六屆 (2009)", group: "男子甲組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "馮晴", score: "47分" },
+        { edition: "第六屆 (2009)", group: "男子甲組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "陸慶濤", score: "41分" },
+        { edition: "第六屆 (2009)", group: "男子甲組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "志豪", score: "34分" },
+        { edition: "第六屆 (2009)", group: "男子甲組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "陳溢", score: "29分" },
+        { edition: "第六屆 (2009)", group: "男子乙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "圓玄", score: "42分" },
+        { edition: "第六屆 (2009)", group: "男子乙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "陳守仁", score: "39分" },
+        { edition: "第六屆 (2009)", group: "男子乙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "錦泰", score: "30分" },
+        { edition: "第六屆 (2009)", group: "男子乙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "田千", score: "23分" },
+        { edition: "第六屆 (2009)", group: "男子丙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "志豪", score: "34分" },
+        { edition: "第六屆 (2009)", group: "男子丙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "田千", score: "29分" },
+        { edition: "第六屆 (2009)", group: "男子丙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "陸慶濤", score: "24分" },
+        { edition: "第六屆 (2009)", group: "男子丙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "莊二上", score: "15分" },
+        { edition: "第六屆 (2009)", group: "女子甲組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "錦泰", score: "51分" },
+        { edition: "第六屆 (2009)", group: "女子甲組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "陸慶濤", score: "34分" },
+        { edition: "第六屆 (2009)", group: "女子甲組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "陳溢", score: "33分" },
+        { edition: "第六屆 (2009)", group: "女子甲組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "陳守仁", score: "26分" },
+        { edition: "第六屆 (2009)", group: "女子乙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "圓玄", score: "46分" },
+        { edition: "第六屆 (2009)", group: "女子乙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "陳守仁", score: "40分" },
+        { edition: "第六屆 (2009)", group: "女子乙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "馮晴", score: "27分" },
+        { edition: "第六屆 (2009)", group: "女子乙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "世德", score: "21分" },
+        { edition: "第六屆 (2009)", group: "女子丙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "陳守仁", score: "46分" },
+        { edition: "第六屆 (2009)", group: "女子丙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "莊二上", score: "32分" },
+        { edition: "第六屆 (2009)", group: "女子丙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "世德", score: "21分" },
+        { edition: "第六屆 (2009)", group: "女子丙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "馮晴", score: "15分" },
 
-        // ====== 第三屆 (2007) ======
-        { edition: "第三屆 (2007)", group: "全場", event: "全場總成績", rank: "第一名", name: "-", school: "方王錦全", score: "210分" },
-        { edition: "第三屆 (2007)", group: "全場", event: "全場總成績", rank: "第二名", name: "-", school: "志豪", score: "168分" },
-        { edition: "第三屆 (2007)", group: "全場", event: "全場總成績", rank: "第三名", name: "-", school: "馮晴", score: "164分" },
-        { edition: "第三屆 (2007)", group: "全場", event: "全場總成績", rank: "第四名", name: "-", school: "朱正賢", score: "160分" },
-        { edition: "第三屆 (2007)", group: "男子甲組", event: "團體成績", rank: "第一名", name: "-", school: "方王錦全", score: "62分" },
-        { edition: "第三屆 (2007)", group: "男子乙組", event: "團體成績", rank: "第一名", name: "-", school: "朱正賢", score: "48分" },
-        { edition: "第三屆 (2007)", group: "男子丙組", event: "團體成績", rank: "第一名", name: "-", school: "方王錦全", score: "43分" },
-        { edition: "第三屆 (2007)", group: "女子甲組", event: "團體成績", rank: "第一名", name: "-", school: "朱正賢", score: "49分" },
-        { edition: "第三屆 (2007)", group: "女子乙組", event: "團體成績", rank: "第一名", name: "-", school: "馮晴", score: "50分" },
-        { edition: "第三屆 (2007)", group: "女子丙組", event: "團體成績", rank: "第一名", name: "-", school: "錦泰", score: "35分" },
-        { edition: "第三屆 (2007)", group: "女子丙組", event: "跳遠", rank: "第一名", name: "辣", school: "-", score: "2.92m" },
-        { edition: "第三屆 (2007)", group: "女子乙組", event: "跳遠", rank: "第一名", name: "主", school: "東森", score: "3.06m" },
-        { edition: "第三屆 (2007)", group: "女子甲組", event: "跳遠", rank: "第一名", name: "巧", school: "-", score: "3.40m" },
-        { edition: "第三屆 (2007)", group: "女子甲組", event: "壘球", rank: "第一名", name: "-", school: "-", score: "34.15m" },
-        { edition: "第三屆 (2007)", group: "男子丙組", event: "60米短跑", rank: "第一名", name: "凌度", school: "千", score: "09.796" },
-        { edition: "第三屆 (2007)", group: "男子丙組", event: "100米短跑", rank: "第一名", name: "寶", school: "万全", score: "15.54" },
-        { edition: "第三屆 (2007)", group: "男子乙組", event: "跳遠", rank: "第一名", name: "-", school: "上", score: "3.94m" },
-        { edition: "第三屆 (2007)", group: "男子甲組", event: "跳遠", rank: "第一名", name: "-", school: "-", score: "3.86m" },
-        { edition: "第三屆 (2007)", group: "男子甲組", event: "鉛球", rank: "第一名", name: "-", school: "-", score: "8.04m" },
-        { edition: "第三屆 (2007)", group: "男子甲組", event: "壘球", rank: "第一名", name: "-", school: "-", score: "41.48m" },
-        { edition: "第三屆 (2007)", group: "男子甲組", event: "200米短跑", rank: "第一名", name: "李家", school: "王全正", score: "27.61" },
+        // ==========================================
+        // 第七屆 (2010) 團體成績
+        // ==========================================
+        { edition: "第七屆 (2010)", group: "男子甲組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "陳守仁", score: "34分" },
+        { edition: "第七屆 (2010)", group: "男子甲組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "莊啟程第二上", score: "32分" },
+        { edition: "第七屆 (2010)", group: "男子甲組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "世德", score: "26分" },
+        { edition: "第七屆 (2010)", group: "男子甲組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "朱正賢", score: "25分" },
+        { edition: "第七屆 (2010)", group: "男子乙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "志豪", score: "36分" },
+        { edition: "第七屆 (2010)", group: "男子乙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "田家炳千禧", score: "30分" },
+        { edition: "第七屆 (2010)", group: "男子乙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "莊啟程第二上", score: "30分" },
+        { edition: "第七屆 (2010)", group: "男子乙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "馮晴紀念", score: "27分" },
+        { edition: "第七屆 (2010)", group: "男子丙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "馮晴紀念", score: "40.5分" },
+        { edition: "第七屆 (2010)", group: "男子丙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "志豪", score: "26分" },
+        { edition: "第七屆 (2010)", group: "男子丙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "朱正賢", score: "23分" },
+        { edition: "第七屆 (2010)", group: "男子丙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "蔡繼有", score: "18.5分" },
+        { edition: "第七屆 (2010)", group: "女子甲組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "陳守仁", score: "49分" },
+        { edition: "第七屆 (2010)", group: "女子甲組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "圓玄", score: "28分" },
+        { edition: "第七屆 (2010)", group: "女子甲組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "莊啟程", score: "26分" },
+        { edition: "第七屆 (2010)", group: "女子甲組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "志豪", score: "23分" },
+        { edition: "第七屆 (2010)", group: "女子乙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "莊啟程第二上", score: "47分" },
+        { edition: "第七屆 (2010)", group: "女子乙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "陳守仁", score: "44分" },
+        { edition: "第七屆 (2010)", group: "女子乙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "圓玄", score: "34分" },
+        { edition: "第七屆 (2010)", group: "女子乙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "錦泰", score: "27分" },
+        { edition: "第七屆 (2010)", group: "女子丙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "莊啟程", score: "42分" },
+        { edition: "第七屆 (2010)", group: "女子丙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "圓玄", score: "28分" },
+        { edition: "第七屆 (2010)", group: "女子丙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "田家炳千禧", score: "26.5分" },
+        { edition: "第七屆 (2010)", group: "女子丙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "世德", score: "17分" },
 
-        // ====== 摘要紀錄 (缺詳細檔案) ======
-        { edition: "第四屆 (2007)", group: "全場", event: "全場總成績", rank: "第一名", name: "-", school: "錦泰", score: "190分" },
-        { edition: "第五屆 (2008)", group: "全場", event: "全場總成績", rank: "第一名", name: "-", school: "錦泰", score: "192分" },
-        
-        // ====== 第六屆 (2009) ======
-        { edition: "第六屆 (2009)", group: "全場", event: "全場總成績", rank: "第一名", name: "-", school: "陳守仁", score: "164分" },
-        { edition: "第六屆 (2009)", group: "男子甲組", event: "團體成績", rank: "第一名", name: "-", school: "馮晴", score: "47分" },
-        { edition: "第六屆 (2009)", group: "男子乙組", event: "團體成績", rank: "第一名", name: "-", school: "圓玄", score: "42分" },
-        { edition: "第六屆 (2009)", group: "男子丙組", event: "團體成績", rank: "第一名", name: "-", school: "志豪", score: "34分" },
-        { edition: "第六屆 (2009)", group: "女子甲組", event: "團體成績", rank: "第一名", name: "-", school: "錦泰", score: "51分" },
-        { edition: "第六屆 (2009)", group: "女子乙組", event: "團體成績", rank: "第一名", name: "-", school: "圓玄", score: "46分" },
-        { edition: "第六屆 (2009)", group: "女子丙組", event: "團體成績", rank: "第一名", name: "-", school: "陳守仁", score: "46分" },
-        { edition: "第六屆 (2009)", group: "男子甲組", event: "跳遠", rank: "第一名", name: "陳浩峰", school: "-", score: "4.06m" },
-        { edition: "第六屆 (2009)", group: "男子甲組", event: "60米短跑", rank: "第一名", name: "胡冰 黃國", school: "通世", score: "0:08.62" },
-        { edition: "第六屆 (2009)", group: "男子甲組", event: "鉛球", rank: "第一名", name: "文", school: "黃永樹", score: "8.01m" },
-        { edition: "第六屆 (2009)", group: "男子乙組", event: "跳遠", rank: "第一名", name: "京", school: "-", score: "3.87m" },
-        { edition: "第六屆 (2009)", group: "男子乙組", event: "壘球", rank: "第一名", name: "-", school: "-", score: "35.74m" },
-        { edition: "第六屆 (2009)", group: "男子乙組", event: "60米短跑", rank: "第一名", name: "TANG SHIN FUNG 李卓", school: "守仁", score: "0:09.30" },
-        { edition: "第六屆 (2009)", group: "女子甲組", event: "跳遠", rank: "第一名", name: "國", school: "-", score: "1.51m" },
-        { edition: "第六屆 (2009)", group: "女子甲組", event: "壘球", rank: "第一名", name: "底", school: "-", score: "26.7m" },
-        { edition: "第六屆 (2009)", group: "女子乙組", event: "跳遠", rank: "第一名", name: "林", school: "銀", score: "2.22m" },
-        { edition: "第六屆 (2009)", group: "女子丙組", event: "跳遠", rank: "第一名", name: "CHEN MING ING", school: "宗", score: "2.7m" }
+        // ==========================================
+        // 第八屆 (2011) 團體成績
+        // ==========================================
+        { edition: "第八屆 (2011)", group: "全場", event: "全場總成績", rank: "第一名 (冠軍)", name: "-", school: "圓玄", score: "190分" },
+        { edition: "第八屆 (2011)", group: "全場", event: "全場總成績", rank: "第二名 (亞軍)", name: "-", school: "陳守仁", score: "161分" },
+        { edition: "第八屆 (2011)", group: "全場", event: "全場總成績", rank: "第三名 (季軍)", name: "-", school: "錦泰", score: "151分" },
+        { edition: "第八屆 (2011)", group: "全場", event: "全場總成績", rank: "第四名 (殿軍)", name: "-", school: "陸慶濤", score: "135分" },
+        { edition: "第八屆 (2011)", group: "全場", event: "優異獎", rank: "優異獎", name: "-", school: "志豪", score: "131.5分" },
+        { edition: "第八屆 (2011)", group: "全場", event: "優異獎", rank: "優異獎", name: "-", school: "馮晴紀念", score: "130分" },
+        { edition: "第八屆 (2011)", group: "全場", event: "優異獎", rank: "優異獎", name: "-", school: "莊啟程", score: "107分" },
+        { edition: "第八屆 (2011)", group: "全場", event: "優異獎", rank: "優異獎", name: "-", school: "莊啟程第二", score: "87分" },
+        { edition: "第八屆 (2011)", group: "男子甲組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "志豪", score: "57分" },
+        { edition: "第八屆 (2011)", group: "男子甲組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "錦泰", score: "53分" },
+        { edition: "第八屆 (2011)", group: "男子甲組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "圓玄", score: "41分" },
+        { edition: "第八屆 (2011)", group: "男子甲組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "陸慶濤", score: "40分" },
+        { edition: "第八屆 (2011)", group: "男子乙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "陳守仁", score: "37分" },
+        { edition: "第八屆 (2011)", group: "男子乙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "莊啟程", score: "28分" },
+        { edition: "第八屆 (2011)", group: "男子乙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "錦泰", score: "28分" },
+        { edition: "第八屆 (2011)", group: "男子乙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "圓玄", score: "27分" },
+        { edition: "第八屆 (2011)", group: "男子丙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "馮晴紀念", score: "36分" },
+        { edition: "第八屆 (2011)", group: "男子丙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "陳守仁", score: "34分" },
+        { edition: "第八屆 (2011)", group: "男子丙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "陸慶濤", score: "24分" },
+        { edition: "第八屆 (2011)", group: "男子丙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "錦泰", score: "23分" },
+        { edition: "第八屆 (2011)", group: "女子甲組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "陳守仁", score: "56分" },
+        { edition: "第八屆 (2011)", group: "女子甲組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "莊啟程第二", score: "35分" },
+        { edition: "第八屆 (2011)", group: "女子甲組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "錦泰", score: "33分" },
+        { edition: "第八屆 (2011)", group: "女子甲組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "陸慶濤", score: "33分" },
+        { edition: "第八屆 (2011)", group: "女子乙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "圓玄(上)", score: "47分" },
+        { edition: "第八屆 (2011)", group: "女子乙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "莊啟程", score: "32分" },
+        { edition: "第八屆 (2011)", group: "女子乙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "田家炳千禧", score: "27分" },
+        { edition: "第八屆 (2011)", group: "女子乙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "馮晴紀念", score: "19分" },
+        { edition: "第八屆 (2011)", group: "女子丙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "朱正賢", score: "28分" },
+        { edition: "第八屆 (2011)", group: "女子丙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "圓玄", score: "27分" },
+        { edition: "第八屆 (2011)", group: "女子丙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "陸慶濤", score: "21分" },
+        { edition: "第八屆 (2011)", group: "女子丙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "雨川", score: "18分" },
+
+        // ==========================================
+        // 第九屆 (2012) 團體成績
+        // ==========================================
+        { edition: "第九屆 (2012)", group: "全場", event: "全場總成績", rank: "第一名 (冠軍)", name: "-", school: "圓玄", score: "202分" },
+        { edition: "第九屆 (2012)", group: "全場", event: "全場總成績", rank: "第二名 (亞軍)", name: "-", school: "陳守仁", score: "184.5分" },
+        { edition: "第九屆 (2012)", group: "全場", event: "全場總成績", rank: "第三名 (季軍)", name: "-", school: "馮晴紀念", score: "152.5分" },
+        { edition: "第九屆 (2012)", group: "全場", event: "全場總成績", rank: "第四名 (殿軍)", name: "-", school: "陸慶濤", score: "147分" },
+        { edition: "第九屆 (2012)", group: "全場", event: "優異獎", rank: "優異獎", name: "-", school: "莊啟程", score: "131分" },
+        { edition: "第九屆 (2012)", group: "全場", event: "優異獎", rank: "優異獎", name: "-", school: "錦泰", score: "111.5分" },
+        { edition: "第九屆 (2012)", group: "全場", event: "優異獎", rank: "優異獎", name: "-", school: "朱正賢", score: "101分" },
+        { edition: "第九屆 (2012)", group: "全場", event: "優異獎", rank: "優異獎", name: "-", school: "世德", score: "87分" },
+        { edition: "第九屆 (2012)", group: "男子甲組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "莊啟程", score: "51分" },
+        { edition: "第九屆 (2012)", group: "男子甲組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "圓玄", score: "45分" },
+        { edition: "第九屆 (2012)", group: "男子甲組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "馮晴紀念", score: "37分" },
+        { edition: "第九屆 (2012)", group: "男子甲組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "陳守仁", score: "29.5分" },
+        { edition: "第九屆 (2012)", group: "男子乙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "馮晴紀念", score: "46分" },
+        { edition: "第九屆 (2012)", group: "男子乙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "錦泰", score: "35分" },
+        { edition: "第九屆 (2012)", group: "男子乙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "朱正賢", score: "34分" },
+        { edition: "第九屆 (2012)", group: "男子乙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "陸慶濤", score: "34分" },
+        { edition: "第九屆 (2012)", group: "男子丙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "陳守仁", score: "39分" },
+        { edition: "第九屆 (2012)", group: "男子丙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "世德", score: "27分" },
+        { edition: "第九屆 (2012)", group: "男子丙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "圓玄", score: "24分" },
+        { edition: "第九屆 (2012)", group: "男子丙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "馮晴紀念", score: "23分" },
+        { edition: "第九屆 (2012)", group: "女子甲組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "圓玄", score: "57分" },
+        { edition: "第九屆 (2012)", group: "女子甲組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "陳守仁", score: "51分" },
+        { edition: "第九屆 (2012)", group: "女子甲組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "世德", score: "37分" },
+        { edition: "第九屆 (2012)", group: "女子甲組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "莊啟程", score: "33分" },
+        { edition: "第九屆 (2012)", group: "女子乙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "馮李佩瑤", score: "37分" },
+        { edition: "第九屆 (2012)", group: "女子乙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "馮晴紀念", score: "30分" },
+        { edition: "第九屆 (2012)", group: "女子乙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "志豪", score: "29分" },
+        { edition: "第九屆 (2012)", group: "女子乙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "圓玄", score: "27分" },
+        { edition: "第九屆 (2012)", group: "女子丙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "陸慶濤", score: "40分" },
+        { edition: "第九屆 (2012)", group: "女子丙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "陳守仁", score: "34分" },
+        { edition: "第九屆 (2012)", group: "女子丙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "莊啟程", score: "25分" },
+        { edition: "第九屆 (2012)", group: "女子丙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "圓玄", score: "24分" },
+
+        // ==========================================
+        // 第十屆 (2013) 團體成績
+        // ==========================================
+        { edition: "第十屆 (2013)", group: "全場", event: "全場總成績", rank: "第一名 (冠軍)", name: "-", school: "陳守仁", score: "179分" },
+        { edition: "第十屆 (2013)", group: "全場", event: "全場總成績", rank: "第二名 (亞軍)", name: "-", school: "錦泰", score: "177分" },
+        { edition: "第十屆 (2013)", group: "全場", event: "全場總成績", rank: "第三名 (季軍)", name: "-", school: "陸慶濤", score: "157分" },
+        { edition: "第十屆 (2013)", group: "全場", event: "全場總成績", rank: "第四名 (殿軍)", name: "-", school: "圓玄", score: "151.5分" },
+        { edition: "第十屆 (2013)", group: "全場", event: "優異獎", rank: "優異獎", name: "-", school: "世德", score: "106分" },
+        { edition: "第十屆 (2013)", group: "全場", event: "優異獎", rank: "優異獎", name: "-", school: "馮晴紀念", score: "104分" },
+        { edition: "第十屆 (2013)", group: "全場", event: "優異獎", rank: "優異獎", name: "-", school: "馮李佩瑤", score: "102分" },
+        { edition: "第十屆 (2013)", group: "全場", event: "優異獎", rank: "優異獎", name: "-", school: "志豪", score: "85.5分" },
+        { edition: "第十屆 (2013)", group: "男子甲組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "馮晴紀念", score: "53分" },
+        { edition: "第十屆 (2013)", group: "男子甲組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "錦泰", score: "49分" },
+        { edition: "第十屆 (2013)", group: "男子甲組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "朱正賢", score: "36分" },
+        { edition: "第十屆 (2013)", group: "男子甲組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "圓玄", score: "30分" },
+        { edition: "第十屆 (2013)", group: "男子乙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "世德", score: "53分" },
+        { edition: "第十屆 (2013)", group: "男子乙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "圓玄", score: "31分" },
+        { edition: "第十屆 (2013)", group: "男子乙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "陳守仁", score: "29分" },
+        { edition: "第十屆 (2013)", group: "男子乙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "陸慶濤", score: "20分" },
+        { edition: "第十屆 (2013)", group: "男子丙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "陳守仁", score: "36分" },
+        { edition: "第十屆 (2013)", group: "男子丙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "田家炳千禧", score: "26分" },
+        { edition: "第十屆 (2013)", group: "男子丙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "陳溢", score: "24分" },
+        { edition: "第十屆 (2013)", group: "男子丙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "錦泰", score: "23分" },
+        { edition: "第十屆 (2013)", group: "女子甲組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "梁周順琴", score: "45分" },
+        { edition: "第十屆 (2013)", group: "女子甲組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "志豪", score: "41.5分" },
+        { edition: "第十屆 (2013)", group: "女子甲組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "馮李佩瑤", score: "38分" },
+        { edition: "第十屆 (2013)", group: "女子甲組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "陸慶濤", score: "30分" },
+        { edition: "第十屆 (2013)", group: "女子乙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "陸慶濤", score: "51分" },
+        { edition: "第十屆 (2013)", group: "女子乙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "陳守仁", score: "42分" },
+        { edition: "第十屆 (2013)", group: "女子乙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "錦泰", score: "33分" },
+        { edition: "第十屆 (2013)", group: "女子乙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "圓玄", score: "30分" },
+        { edition: "第十屆 (2013)", group: "女子丙組", event: "團體成績", rank: "第一名 (冠軍)", name: "-", school: "陳守仁", score: "37分" },
+        { edition: "第十屆 (2013)", group: "女子丙組", event: "團體成績", rank: "第二名 (亞軍)", name: "-", school: "錦泰", score: "31分" },
+        { edition: "第十屆 (2013)", group: "女子丙組", event: "團體成績", rank: "第三名 (季軍)", name: "-", school: "陸慶濤", score: "24分" },
+        { edition: "第十屆 (2013)", group: "女子丙組", event: "團體成績", rank: "第四名 (殿軍)", name: "-", school: "圓玄", score: "21分" }
     ];
-    // ==========================================
 
     const tableBody = document.getElementById('tableBody');
     const recordCount = document.getElementById('recordCount');
     
-    // 綁定篩選器事件
     const filters = {
         edition: document.getElementById('editionFilter'),
         group: document.getElementById('groupFilter'),
@@ -399,12 +464,9 @@
         const searchVal = filters.search.value.toLowerCase().trim();
 
         const filtered = athleticsData.filter(item => {
-            // 下拉選單匹配 (精確包含)
             if (editionVal && !item.edition.includes(editionVal)) return false;
             if (groupVal && !item.group.includes(groupVal)) return false;
             if (eventVal && !item.event.includes(eventVal)) return false;
-            
-            // 關鍵字匹配 (全欄位模糊搜尋)
             if (searchVal) {
                 const rowString = Object.values(item).join(' ').toLowerCase();
                 if (!rowString.includes(searchVal)) return false;
@@ -415,13 +477,11 @@
         renderTable(filtered);
     }
 
-    // 監聽所有輸入與選單變更
     Object.values(filters).forEach(element => {
         element.addEventListener('input', applyFilters);
         element.addEventListener('change', applyFilters);
     });
 
-    // 初始載入
     renderTable(athleticsData);
 </script>
 </body>
