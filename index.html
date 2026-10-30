@@ -3,191 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>保良局屬下小學田徑歷屆成績</title>
+    <title>保良局屬下小學田徑歷屆成績庫</title>
     <style>
-        body {
-            font-family: "Microsoft JhengHei", "PingFang HK", sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 20px 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #0056b3;
-        }
-        .search-bar {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-            font-size: 14px;
-        }
-        th {
-            background-color: #0056b3;
-            color: white;
-            position: sticky;
-            top: 0;
-        }
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-        .status {
-            text-align: center;
-            color: #888;
-            padding: 20px;
-        }
+        :root { --primary: #0056b3; --bg: #f4f7f6; --text: #333; }
+        body { font-family: "Microsoft JhengHei", "PingFang HK", sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; background: #fff; padding: 20px 30px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        h1 { text-align: center; color: var(--primary); margin-bottom: 30px; }
+        .controls { display: flex; gap: 15px; margin-bottom: 20px; }
+        .search-bar { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
+        .stats { text-align: right; font-size: 14px; color: #666; margin-bottom: 10px; }
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; white-space: nowrap; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: var(--primary); color: white; position: sticky; top: 0; font-weight: 500; }
+        tr:hover { background-color: #f9f9f9; }
+        .badge { background: #e9ecef; padding: 4px 8px; border-radius: 4px; font-size: 13px; }
+        .rank-1 { color: #d4af37; font-weight: bold; } /* 金 */
+        .rank-2 { color: #c0c0c0; font-weight: bold; } /* 銀 */
+        .rank-3 { color: #cd7f32; font-weight: bold; } /* 銅 */
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>保良局屬下小學田徑歷屆成績 🏃‍♂️</h1>
+    <h1>🏆 保良局屬下小學田徑歷屆成績庫</h1>
     
-    <input type="text" id="searchInput" class="search-bar" placeholder="🔍 搜尋年份、組別、項目或學校姓名..." style="display: none;">
-    
-    <div style="overflow-x: auto;">
-        <table id="recordsTable">
-            <thead id="tableHeader"></thead>
+    <div class="controls">
+        <input type="text" id="searchInput" class="search-bar" placeholder="🔍 搜尋屆別、年份、學校、姓名或項目 (例如：錦泰、100米、第一屆)...">
+    </div>
+    <div class="stats" id="recordCount">載入中...</div>
+
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th>屆別 (年份)</th>
+                    <th>組別</th>
+                    <th>項目</th>
+                    <th>名次</th>
+                    <th>學生姓名</th>
+                    <th>學校</th>
+                    <th>成績</th>
+                </tr>
+            </thead>
             <tbody id="tableBody">
-                <tr><td class="status" id="loadingStatus">正在連線至保良局網站自動抓取資料，請稍候...</td></tr>
+                <!-- 資料將由 JavaScript 動態生成 -->
             </tbody>
         </table>
     </div>
 </div>
 
 <script>
-    // 目標網址
-    const targetUrl = 'https://edu.poleungkuk.org.hk/match/Sports/athletic.htm';
-    // 利用 AllOrigins CORS Proxy 繞過瀏覽器跨網域限制
-    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+    // ==========================================
+    // 📊 資料庫區塊
+    // ==========================================
+    const athleticsData = [
+        // --- 第一屆 (2004) ---
+        { edition: "第一屆 (2004)", group: "全場", event: "全場總冠軍", rank: "第一名", name: "-", school: "錦泰", score: "104分" },
+        { edition: "第一屆 (2004)", group: "男子甲組", event: "團體成績", rank: "第一名", name: "-", school: "雨川", score: "32分" },
+        { edition: "第一屆 (2004)", group: "男子甲組", event: "團體成績", rank: "第二名", name: "-", school: "錦泰", score: "27分" },
+        { edition: "第一屆 (2004)", group: "男子乙組", event: "團體成績", rank: "第一名", name: "-", school: "朱正賢上", score: "37分" },
+        { edition: "第一屆 (2004)", group: "女子甲組", event: "團體成績", rank: "第一名", name: "-", school: "錦泰", score: "47分" },
+        { edition: "第一屆 (2004)", group: "女子乙組", event: "團體成績", rank: "第一名", name: "-", school: "方王錦全", score: "36分" },
+        { edition: "第一屆 (2004)", group: "男子甲組", event: "100米短跑", rank: "第一名", name: "雙友", school: "黃永樹", score: "13.64" },
+        { edition: "第一屆 (2004)", group: "男子甲組", event: "100米短跑", rank: "第二名", name: "招啟峰", school: "陸慶濤", score: "13.97" },
+        { edition: "第一屆 (2004)", group: "男子甲組", event: "100米短跑", rank: "第三名", name: "吳卓源", school: "錦泰", score: "14.27" },
+        { edition: "第一屆 (2004)", group: "男子甲組", event: "200米短跑", rank: "第一名", name: "王子建", school: "蕭漢森", score: "28.8" },
+        { edition: "第一屆 (2004)", group: "男子甲組", event: "4x100米接力", rank: "第一名", name: "-", school: "雨川", score: "57.41" },
+        { edition: "第一屆 (2004)", group: "男子甲組", event: "跳遠", rank: "第一名", name: "陳朗", school: "志豪", score: "4.12m" },
+        { edition: "第一屆 (2004)", group: "女子甲組", event: "100米短跑", rank: "第一名", name: "劉穎恩", school: "錦泰", score: "14.707" },
+        { edition: "第一屆 (2004)", group: "女子甲組", event: "100米短跑", rank: "第二名", name: "黃麗晶", school: "黃族宗親會", score: "14.807" },
 
-    let allRecords = [];
-    let headers = [];
+        // --- 第二屆 (2005) ---
+        { edition: "第二屆 (2005)", group: "全場", event: "全場總冠軍", rank: "第一名", name: "-", school: "志豪 / 莊啟程", score: "147分" },
+        { edition: "第二屆 (2005)", group: "全場", event: "全場總季軍", rank: "第三名", name: "-", school: "朱正賢", score: "128分" },
+        { edition: "第二屆 (2005)", group: "全場", event: "全場總殿軍", rank: "第四名", name: "-", school: "錦泰", score: "113分" },
+        { edition: "第二屆 (2005)", group: "男子甲組", event: "團體成績", rank: "第一名", name: "-", school: "黃族宗親會", score: "40分" },
+        { edition: "第二屆 (2005)", group: "男子乙組", event: "團體成績", rank: "第一名", name: "-", school: "志豪", score: "30分" },
+        { edition: "第二屆 (2005)", group: "男子丙組", event: "團體成績", rank: "第一名", name: "-", school: "莊啟程", score: "40分" },
+        { edition: "第二屆 (2005)", group: "女子甲組", event: "團體成績", rank: "第一名", name: "-", school: "田千", score: "50分" },
+        { edition: "第二屆 (2005)", group: "女子乙組", event: "團體成績", rank: "第一名", name: "-", school: "錦泰", score: "39分" },
+        { edition: "第二屆 (2005)", group: "女子丙組", event: "團體成績", rank: "第一名", name: "-", school: "蕭漢森", score: "31分" },
 
-    // 自動抓取資料
-    fetch(proxyUrl)
-        .then(response => {
-            if (response.ok) return response.json();
-            throw new Error('網路連線發生錯誤');
-        })
-        .then(data => {
-            // 將抓取到的 HTML 字串轉換為可操作的 DOM 物件
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(data.contents, 'text/html');
-            
-            // 尋找網頁中的主要表格 (排除排版用的無關表格)
-            const tables = doc.querySelectorAll('table');
-            let targetTable = null;
-            
-            // 假設資料最多或最寬的表格就是成績表
-            let maxRows = 0;
-            tables.forEach(tbl => {
-                const rowsCount = tbl.querySelectorAll('tr').length;
-                if(rowsCount > maxRows) {
-                    maxRows = rowsCount;
-                    targetTable = tbl;
-                }
-            });
+        // --- 第三屆 (2007) ---
+        { edition: "第三屆 (2007)", group: "全場", event: "全場總成績", rank: "第一名", name: "-", school: "方王錦全", score: "210分" },
+        { edition: "第三屆 (2007)", group: "全場", event: "全場總成績", rank: "第二名", name: "-", school: "志豪", score: "168分" },
+        { edition: "第三屆 (2007)", group: "全場", event: "全場總成績", rank: "第三名", name: "-", school: "馮晴", score: "164分" },
+        { edition: "第三屆 (2007)", group: "全場", event: "全場總成績", rank: "第四名", name: "-", school: "朱正賢", score: "160分" },
+        { edition: "第三屆 (2007)", group: "男子甲組", event: "團體成績", rank: "第一名", name: "-", school: "方王錦全", score: "62分" },
+        { edition: "第三屆 (2007)", group: "男子甲組", event: "團體成績", rank: "第二名", name: "-", school: "志豪", score: "42分" },
+        { edition: "第三屆 (2007)", group: "男子甲組", event: "團體成績", rank: "第三名", name: "-", school: "朱正賢", score: "37分" },
+        { edition: "第三屆 (2007)", group: "男子甲組", event: "團體成績", rank: "第四名", name: "-", school: "黃族宗親會", score: "35分" },
+        { edition: "第三屆 (2007)", group: "男子乙組", event: "團體成績", rank: "第一名", name: "-", school: "朱正賢", score: "48分" },
+        { edition: "第三屆 (2007)", group: "男子乙組", event: "團體成績", rank: "第二名", name: "-", school: "莊啟程", score: "41分" },
+        { edition: "第三屆 (2007)", group: "男子乙組", event: "團體成績", rank: "第三名", name: "-", school: "志豪", score: "39分" },
+        { edition: "第三屆 (2007)", group: "男子乙組", event: "團體成績", rank: "第四名", name: "-", school: "馮晴", score: "23分" },
+        { edition: "第三屆 (2007)", group: "男子丙組", event: "團體成績", rank: "第一名", name: "-", school: "方王錦全", score: "43分" },
+        { edition: "第三屆 (2007)", group: "男子丙組", event: "團體成績", rank: "第二名", name: "-", school: "莊啟程", score: "29分" },
+        { edition: "第三屆 (2007)", group: "男子丙組", event: "團體成績", rank: "第三名", name: "-", school: "錦泰", score: "24分" },
+        { edition: "第三屆 (2007)", group: "男子丙組", event: "團體成績", rank: "第四名", name: "-", school: "馮晴", score: "22分" },
+        { edition: "第三屆 (2007)", group: "女子甲組", event: "團體成績", rank: "第一名", name: "-", school: "朱正賢", score: "49分" },
+        { edition: "第三屆 (2007)", group: "女子甲組", event: "團體成績", rank: "第二名", name: "-", school: "方王錦全", score: "41分" },
+        { edition: "第三屆 (2007)", group: "女子甲組", event: "團體成績", rank: "第三名", name: "-", school: "志豪", score: "31分" },
+        { edition: "第三屆 (2007)", group: "女子甲組", event: "團體成績", rank: "第四名", name: "-", school: "莊啟程", score: "28分" },
+        { edition: "第三屆 (2007)", group: "女子乙組", event: "團體成績", rank: "第一名", name: "-", school: "馮晴", score: "50分" },
+        { edition: "第三屆 (2007)", group: "女子乙組", event: "團體成績", rank: "第二名", name: "-", school: "方王錦全", score: "39分" },
+        { edition: "第三屆 (2007)", group: "女子乙組", event: "團體成績", rank: "第三名", name: "-", school: "蕭漢森", score: "34分" },
+        { edition: "第三屆 (2007)", group: "女子乙組", event: "團體成績", rank: "第四名", name: "-", school: "莊啟程", score: "31分" },
+        { edition: "第三屆 (2007)", group: "女子丙組", event: "團體成績", rank: "第一名", name: "-", school: "錦泰", score: "35分" },
+        { edition: "第三屆 (2007)", group: "女子丙組", event: "團體成績", rank: "第二名", name: "-", school: "馮晴", score: "26分" },
+        { edition: "第三屆 (2007)", group: "女子丙組", event: "團體成績", rank: "第三名", name: "-", school: "陳守仁", score: "26分" },
+        { edition: "第三屆 (2007)", group: "女子丙組", event: "團體成績", rank: "第四名", name: "-", school: "田千", score: "24分" },
 
-            if (!targetTable || maxRows < 2) {
-                throw new Error('無法在目標網頁找到成績表格，網頁架構可能已更改。');
-            }
-
-            const rows = targetTable.querySelectorAll('tr');
-            
-            // 處理表頭
-            const headerCells = rows[0].querySelectorAll('th, td');
-            headerCells.forEach(cell => {
-                headers.push(cell.innerText.trim().replace(/\s+/g, ' '));
-            });
-
-            // 處理資料列
-            for (let i = 1; i < rows.length; i++) {
-                const cells = rows[i].querySelectorAll('td');
-                // 略過分隔線或空白列
-                if (cells.length >= headers.length - 1 && cells[0].innerText.trim() !== "") {
-                    let rowData = {};
-                    cells.forEach((cell, index) => {
-                        if (headers[index]) {
-                            rowData[headers[index]] = cell.innerText.trim().replace(/\s+/g, ' ');
-                        }
-                    });
-                    allRecords.push(rowData);
-                }
-            }
-
-            // 顯示搜尋框與表格
-            document.getElementById('searchInput').style.display = 'block';
-            renderTable(allRecords);
-        })
-        .catch(error => {
-            document.getElementById('loadingStatus').innerText = `載入失敗: ${error.message}`;
-            document.getElementById('loadingStatus').style.color = 'red';
-        });
-
-    // 繪製表格
-    function renderTable(data) {
-        const thead = document.getElementById('tableHeader');
-        const tbody = document.getElementById('tableBody');
+        // --- 第四屆 (2007/12) ---
+        { edition: "第四屆 (2007)", group: "全場", event: "全場總成績", rank: "第一名", name: "-", school: "錦泰", score: "190分" },
+        { edition: "第四屆 (2007)", group: "全場", event: "全場總成績", rank: "第二名", name: "-", school: "方王錦全", score: "158.5分" },
+        { edition: "第四屆 (2007)", group: "全場", event: "全場總成績", rank: "第三名", name: "-", school: "志豪", score: "141.5分" },
+        { edition: "第四屆 (2007)", group: "全場", event: "全場總成績", rank: "第四名", name: "-", school: "田千", score: "132分" },
         
-        thead.innerHTML = '';
-        tbody.innerHTML = '';
+        { edition: "第四屆 (2007)", group: "男子甲組", event: "團體成績", rank: "第一名", name: "-", school: "朱正賢", score: "46分" },
+        { edition: "第四屆 (2007)", group: "男子甲組", event: "團體成績", rank: "第二名", name: "-", school: "錦泰", score: "36分" },
+        { edition: "第四屆 (2007)", group: "男子甲組", event: "團體成績", rank: "第三名", name: "-", school: "世德", score: "30分" },
+        { edition: "第四屆 (2007)", group: "男子甲組", event: "團體成績", rank: "第四名", name: "-", school: "莊啟程", score: "26分" },
+        
+        { edition: "第四屆 (2007)", group: "男子乙組", event: "團體成績", rank: "第一名", name: "-", school: "方王錦全", score: "42分" },
+        { edition: "第四屆 (2007)", group: "男子乙組", event: "團體成績", rank: "第二名", name: "-", school: "錦泰", score: "41分" },
+        { edition: "第四屆 (2007)", group: "男子乙組", event: "團體成績", rank: "第三名", name: "-", school: "志豪", score: "26分" },
+        { edition: "第四屆 (2007)", group: "男子乙組", event: "團體成績", rank: "第四名", name: "-", school: "莊啟程", score: "22分" },
+        
+        { edition: "第四屆 (2007)", group: "男子丙組", event: "團體成績", rank: "第一名", name: "-", school: "馮晴", score: "38分" },
+        { edition: "第四屆 (2007)", group: "男子丙組", event: "團體成績", rank: "第二名", name: "-", school: "志豪", score: "30分" },
+        { edition: "第四屆 (2007)", group: "男子丙組", event: "團體成績", rank: "第三名", name: "-", school: "錦泰", score: "25分" },
+        { edition: "第四屆 (2007)", group: "男子丙組", event: "團體成績", rank: "第四名", name: "-", school: "何壽南", score: "17分" },
+        
+        { edition: "第四屆 (2007)", group: "女子甲組", event: "團體成績", rank: "第一名", name: "-", school: "方王錦全", score: "57分" },
+        { edition: "第四屆 (2007)", group: "女子甲組", event: "團體成績", rank: "第二名", name: "-", school: "馮晴", score: "47分" },
+        { edition: "第四屆 (2007)", group: "女子甲組", event: "團體成績", rank: "第三名", name: "-", school: "田千", score: "41分" },
+        { edition: "第四屆 (2007)", group: "女子甲組", event: "團體成績", rank: "第四名", name: "-", school: "志豪", score: "34.5分" },
+        
+        { edition: "第四屆 (2007)", group: "女子乙組", event: "團體成績", rank: "第一名", name: "-", school: "世德", score: "35分" },
+        { edition: "第四屆 (2007)", group: "女子乙組", event: "團體成績", rank: "第二名", name: "-", school: "錦泰", score: "34分" },
+        { edition: "第四屆 (2007)", group: "女子乙組", event: "團體成績", rank: "第三名", name: "-", school: "田千", score: "33分" },
+        { edition: "第四屆 (2007)", group: "女子乙組", event: "團體成績", rank: "第四名", name: "-", school: "梁周順琴(下)", score: "27分" },
+        
+        { edition: "第四屆 (2007)", group: "女子丙組", event: "團體成績", rank: "第一名", name: "-", school: "錦泰", score: "25分" },
+        { edition: "第四屆 (2007)", group: "女子丙組", event: "團體成績", rank: "第二名", name: "-", school: "莊啟程二上", score: "24分" },
+        { edition: "第四屆 (2007)", group: "女子丙組", event: "團體成績", rank: "第三名", name: "-", school: "田千", score: "23分" },
+        { edition: "第四屆 (2007)", group: "女子丙組", event: "團體成績", rank: "第四名", name: "-", school: "陳溢", score: "22.5分" }
+    ];
+    // ==========================================
 
+    const tableBody = document.getElementById('tableBody');
+    const searchInput = document.getElementById('searchInput');
+    const recordCount = document.getElementById('recordCount');
+
+    function getRankClass(rank) {
+        if(rank.includes('一') || rank.includes('冠')) return 'rank-1';
+        if(rank.includes('二') || rank.includes('亞')) return 'rank-2';
+        if(rank.includes('三') || rank.includes('季')) return 'rank-3';
+        return '';
+    }
+
+    function renderTable(data) {
+        tableBody.innerHTML = '';
+        recordCount.textContent = `顯示共 ${data.length} 筆紀錄`;
+        
         if (data.length === 0) {
-            tbody.innerHTML = '<tr><td class="status">找不到符合的記錄。</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:#888;">找不到符合的成績。</td></tr>';
             return;
         }
 
-        // 產生表頭
-        const headerRow = document.createElement('tr');
-        headers.forEach(headerText => {
-            const th = document.createElement('th');
-            th.textContent = headerText;
-            headerRow.appendChild(th);
-        });
-        thead.appendChild(headerRow);
-
-        // 產生資料
-        data.forEach(record => {
+        data.forEach(item => {
             const tr = document.createElement('tr');
-            headers.forEach(header => {
-                const td = document.createElement('td');
-                td.textContent = record[header] || '';
-                tr.appendChild(td);
-            });
-            tbody.appendChild(tr);
+            tr.innerHTML = `
+                <td><span class="badge">${item.edition}</span></td>
+                <td>${item.group}</td>
+                <td>${item.event}</td>
+                <td class="${getRankClass(item.rank)}">${item.rank}</td>
+                <td>${item.name}</td>
+                <td>${item.school}</td>
+                <td><strong>${item.score}</strong></td>
+            `;
+            tableBody.appendChild(tr);
         });
     }
 
-    // 搜尋過濾功能
-    document.getElementById('searchInput').addEventListener('input', function(e) {
-        const keyword = e.target.value.toLowerCase();
-        const filteredData = allRecords.filter(record => {
-            return Object.values(record).join(' ').toLowerCase().includes(keyword);
+    renderTable(athleticsData);
+
+    searchInput.addEventListener('input', (e) => {
+        const keyword = e.target.value.toLowerCase().trim();
+        const filtered = athleticsData.filter(item => {
+            const rowString = Object.values(item).join(' ').toLowerCase();
+            return rowString.includes(keyword);
         });
-        renderTable(filteredData);
+        renderTable(filtered);
     });
 </script>
 
