@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>保良局屬下小學田徑歷屆成績</title>
+    <style>
+        body {
+            font-family: "Microsoft JhengHei", "PingFang HK", sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #0056b3;
+        }
+        .search-bar {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+        }
+        th {
+            background-color: #0056b3;
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .status {
+            text-align: center;
+            color: #888;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>保良局屬下小學田徑歷屆成績 🏃‍♂️</h1>
+    
+    <input type="text" id="searchInput" class="search-bar" placeholder="🔍 搜尋年份、組別、項目或學校姓名..." style="display: none;">
+    
+    <div style="overflow-x: auto;">
+        <table id="recordsTable">
+            <thead id="tableHeader"></thead>
+            <tbody id="tableBody">
+                <tr><td class="status" id="loadingStatus">正在連線至保良局網站自動抓取資料，請稍候...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // 目標網址
+    const targetUrl = 'https://edu.poleungkuk.org.hk/match/Sports/athletic.htm';
+    // 利用 AllOrigins CORS Proxy 繞過瀏覽器跨網域限制
+    const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+
+    let allRecords = [];
+    let headers = [];
+
+    // 自動抓取資料
+    fetch(proxyUrl)
+        .then(response => {
+            if (response.ok) return response.json();
+            throw new Error('網路連線發生錯誤');
+        })
+        .then(data => {
+            // 將抓取到的 HTML 字串轉換為可操作的 DOM 物件
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(data.contents, 'text/html');
+            
+            // 尋找網頁中的主要表格 (排除排版用的無關表格)
+            const tables = doc.querySelectorAll('table');
+            let targetTable = null;
+            
+            // 假設資料最多或最寬的表格就是成績表
+            let maxRows = 0;
+            tables.forEach(tbl => {
+                const rowsCount = tbl.querySelectorAll('tr').length;
+                if(rowsCount > maxRows) {
+                    maxRows = rowsCount;
+                    targetTable = tbl;
+                }
+            });
+
+            if (!targetTable || maxRows < 2) {
+                throw new Error('無法在目標網頁找到成績表格，網頁架構可能已更改。');
+            }
+
+            const rows = targetTable.querySelectorAll('tr');
+            
+            // 處理表頭
+            const headerCells = rows[0].querySelectorAll('th, td');
+            headerCells.forEach(cell => {
+                headers.push(cell.innerText.trim().replace(/\s+/g, ' '));
+            });
+
+            // 處理資料列
+            for (let i = 1; i < rows.length; i++) {
+                const cells = rows[i].querySelectorAll('td');
+                // 略過分隔線或空白列
+                if (cells.length >= headers.length - 1 && cells[0].innerText.trim() !== "") {
+                    let rowData = {};
+                    cells.forEach((cell, index) => {
+                        if (headers[index]) {
+                            rowData[headers[index]] = cell.innerText.trim().replace(/\s+/g, ' ');
+                        }
+                    });
+                    allRecords.push(rowData);
+                }
+            }
+
+            // 顯示搜尋框與表格
+            document.getElementById('searchInput').style.display = 'block';
+            renderTable(allRecords);
+        })
+        .catch(error => {
+            document.getElementById('loadingStatus').innerText = `載入失敗: ${error.message}`;
+            document.getElementById('loadingStatus').style.color = 'red';
+        });
+
+    // 繪製表格
+    function renderTable(data) {
+        const thead = document.getElementById('tableHeader');
+        const tbody = document.getElementById('tableBody');
+        
+        thead.innerHTML = '';
+        tbody.innerHTML = '';
+
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td class="status">找不到符合的記錄。</td></tr>';
+            return;
+        }
+
+        // 產生表頭
+        const headerRow = document.createElement('tr');
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+
+        // 產生資料
+        data.forEach(record => {
+            const tr = document.createElement('tr');
+            headers.forEach(header => {
+                const td = document.createElement('td');
+                td.textContent = record[header] || '';
+                tr.appendChild(td);
+            });
+            tbody.appendChild(tr);
+        });
+    }
+
+    // 搜尋過濾功能
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        const keyword = e.target.value.toLowerCase();
+        const filteredData = allRecords.filter(record => {
+            return Object.values(record).join(' ').toLowerCase().includes(keyword);
+        });
+        renderTable(filteredData);
+    });
+</script>
+
+</body>
+</html>
